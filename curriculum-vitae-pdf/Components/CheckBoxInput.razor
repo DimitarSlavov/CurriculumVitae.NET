@@ -1,0 +1,88 @@
+﻿<div class="mt-3 col-6">
+	<label for="@Name">@Label</label>
+	<input class="d-none" type="checkbox" name="@Name"
+		   @attributes="Attributes" />
+	<button type="button" class="btn w-100 @ToggleClass"
+			@onclick="(() => { ToggleCheckbox(); })">
+		@BntContent
+	</button>
+</div>
+
+@code {
+	private const string BntSuccess = "btn-success";
+	private const string BntDanger = "btn-danger";
+	private string ToggleClass = BntDanger;
+	private const string Yes = "Yes";
+	private const string No = "No";
+	private string BntContent = No;
+	private const string Checked = "checked";
+	private string CheckboxValue;
+	private KeyValuePair<string, object> Attribute
+		= new KeyValuePair<string, object>(Checked, Checked);
+	private IList<KeyValuePair<string, object>> Attributes
+		= new List<KeyValuePair<string, object>>();
+
+	private bool? _data;
+
+	[Parameter]
+	public string Label { get; set; }
+
+	[Parameter]
+	public bool? Data {
+		get
+		{
+			return _data;
+		}
+		set
+		{
+			_data = value;
+
+			if (_data is true)
+			{
+				SetTrueCheckBox();
+			}
+			else
+			{
+				SetFalseCheckBox();
+			}
+		}
+	}
+
+	[Parameter]
+	public string Name { get; set; }
+
+	[Parameter]
+	public EventCallback<bool?> DataChanged { get; set; }
+
+	private void ToggleCheckbox()
+	{
+		if (ToggleClass.Equals(BntDanger))
+		{
+			_data = true;
+			DataChanged.InvokeAsync(_data);
+			SetTrueCheckBox();
+		}
+		else
+		{
+			_data = false;
+			DataChanged.InvokeAsync(_data);
+			SetFalseCheckBox();
+		}
+
+		StateHasChanged();
+	}
+
+	private void SetTrueCheckBox()
+	{
+		ToggleClass = BntSuccess;
+		BntContent = Yes;
+		Attributes.Add(Attribute);
+	}
+
+	private void SetFalseCheckBox() 
+	{ 			
+		ToggleClass = BntDanger;
+		BntContent = No;
+		Attributes.Remove(Attribute);
+	}
+}

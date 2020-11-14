@@ -1,0 +1,189 @@
+﻿@page "/"
+
+@using System.IO
+@using CurriculumVitae
+@using static CurriculumVitae.Helpers.EmailHelper
+
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Env
+@inject IJSRuntime JSRuntime
+@inject CvBuilderContext CvBuilderContext
+
+<ProgressBar ProgressValue="ProgressValue" ShowProgressBar="ShowProgressBar"/>
+
+<div>
+	<h2 class="d-inline-block">
+		@StringConstants.Hello,
+		@(!string.IsNullOrEmpty(Details.ContactDetails.FirstName) ? $"{Details.ContactDetails.FirstName} {Details.ContactDetails.Surname}" : StringConstants.Mate)!
+	</h2>
+	<input type="button" class="btn btn-dark float-right m-1" @onclick="() => SendToEmailAsync()" value="Send to Email" />
+
+	<input id="email-address" type="text" class="input-group-text float-right m-1" placeholder="Fill email address" @onchange="e => EmailAddress = e.Value as string" />
+
+	<input type="button" id="download-pdf" class="btn btn-dark float-right m-1" @onclick="() => DownloadFileAsync()" style="@Toggle(ProgressValue == default(byte), "pointer-events: none; cursor: not-allowed;")" value="@StringConstants.DownloadPDF" />
+</div>
+
+<EditForm Model="this.Details" OnValidSubmit="DownloadFileAsync" style="margin-bottom: 60px;">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+	<div class="@CheckStep((int)NavigationButtons.Step.First)">
+		<ContactDetails @bind-Model="this.Details" />
+	</div>
+	<div class="@CheckStep((int)NavigationButtons.Step.Second)">
+		<ExperienceDetails @bind-Model="this.Details" />
+	</div>
+	<div class="@CheckStep((int)NavigationButtons.Step.Third)">
+		<EducationDetails @bind-Model="this.Details" />
+	</div>
+	<div class="@CheckStep((int)NavigationButtons.Step.Fourth)">
+		<SkillsDetails @bind-Model="this.Details" />
+	</div>
+	<div class="@CheckStep((int)NavigationButtons.Step.Fifth)">
+		<ProfessionalSummaryDetails @bind-Model="this.Details" />
+	</div>
+	<NavigationButtons @bind-CurrentStep="this.CurrentStep" />
+</EditForm>
+
+@code {
+	private const string DisplayNone = "d-none";
+	private const string SavedFilesPath = "Files";
+
+	public Index()
+	{
+		this.Details = new PersonDetails();
+	}
+
+	private bool DisableDownloadButton { get; set; }
+	private bool ShowProgressBar { get; set; }
+	private byte ProgressValue { get; set; }
+	private string EmailAddress { get; set; }
+	private int CurrentStep { get; set; } = (int)NavigationButtons.Step.First;
+	private string StyleBootstrap { get; set; }
+	private string StyleSite { get; set; }
+
+	private PersonDetails Details { get; set; }
+
+	private string CheckStep(int formNumber)
+		=> Toggle(CurrentStep == formNumber, DisplayNone);
+
+	private async Task DownloadFileAsync()
+	{
+		var fileParams = await AddFolderAndFileAsync();
+
+		await JSRuntime.InvokeVoidAsync("fileSaveAs", fileParams.Item1.Substring(fileParams.Item1.IndexOf("Files")), fileParams.Item2);
+
+		await Task.Delay(5000);
+
+		File.Delete(Path.Combine(fileParams.Item1, fileParams.Item2));
+	}
+
+	private async Task SetCssAsStringAsync()
+	{
+		if (string.IsNullOrEmpty(StyleBootstrap))
+		{
+			var bootstrapCssPath = Path.Join(
+				Env.WebRootPath,
+				"css",
+				"bootstrap",
+				"bootstrap.css");
+
+			StyleBootstrap = await FileHelper.GetCssFileAsString(bootstrapCssPath);
+		}
+
+		if (string.IsNullOrEmpty(StyleSite))
+		{
+			var siteCssPath = Path.Join(
+				Env.WebRootPath,
+				"css",
+				"site.css");
+
+			StyleSite = await FileHelper.GetCssFileAsString(siteCssPath);
+		}
+	}
+
+	private async Task<Tuple<string, string>> AddFolderAndFileAsync()
+	{
+		await SetCssAsStringAsync();
+
+		ProgressValue = (int)ProgressBar.Progress.Zero;
+		ShowProgressBar = true;
+
+		StateHasChanged();
+
+		ProgressValue = (int)ProgressBar.Progress.Twenty;
+
+		StateHasChanged();
+
+		var html = await CvBuilderContext.BuildPage(
+			this.Details,
+			StyleBootstrap,
+			StyleSite);
+
+		ProgressValue = (int)ProgressBar.Progress.Foutry;
+
+		StateHasChanged();
+
+		var filePath = ManageDirectories();
+
+		ProgressValue = (int)ProgressBar.Progress.Sixty;
+
+		StateHasChanged();
+
+		ProgressValue = (int)ProgressBar.Progress.Eighty;
+
+		StateHasChanged();
+
+		ProgressValue = (int)ProgressBar.Progress.Ninety;
+
+		StateHasChanged();
+
+		var fileName = $"{Details.ContactDetails.FirstName ?? "John"}_{Details.ContactDetails.Surname ?? "Doe"}_{DateTime.Now.ToString("MM-dd-yy")}_{DateTime.Now.Ticks}.pdf";
+
+		PdfHelper.ConvertHtmlToPdf(
+			html,
+			Path.Combine(filePath, fileName));
+
+		ProgressValue = (int)ProgressBar.Progress.OneHundread;
+
+		StateHasChanged();
+
+		ShowProgressBar = false;
+		ProgressValue = (int)ProgressBar.Progress.Zero;
+
+		StateHasChanged();
+
+		return Tuple.Create(filePath, fileName);
+	}
+
+	private async Task SendToEmailAsync()
+	{
+		if (!string.IsNullOrWhiteSpace(EmailAddress))
+		{
+			var fileParams = await AddFolderAndFileAsync();
+
+			await SendEmailAsync(EmailAddress, Path.Combine(fileParams.Item1, fileParams.Item2));
+
+			await Task.Delay(5000);
+
+			File.Delete(Path.Combine(fileParams.Item1, fileParams.Item2));
+		}
+	}
+
+	private void CreateDirectoryIfNotExists(string path)
+	{
+		if (!Directory.Exists(path))
+			Directory.CreateDirectory(path);
+	}
+
+	private string ManageDirectories()
+	{
+		var FilesFolder = Path.Combine(Env.WebRootPath, SavedFilesPath);
+		CreateDirectoryIfNotExists(FilesFolder);
+
+		Directory.SetCurrentDirectory(FilesFolder);
+
+		return FilesFolder;
+	}
+
+	private string Toggle(bool condition, string item)
+		=> condition ? string.Empty : item;
+}

@@ -1,0 +1,53 @@
+﻿<div class="btn-group bg-white d-flex position-absolute" style="left: 250px; right: 0; bottom: 0;">
+	<input class="btn btn-outline-secondary btn-outline-dark float-left m-2" type="button" @onclick="() => DecreseStep()" name="Prev" value="Prev" />
+	<input class="btn btn-outline-secondary btn-outline-dark float-right m-2" type="button" @onclick="() => IncreaseStep()" name="Next" value="Next" />
+</div>
+
+@code {
+	public enum Step
+	{
+		First = 1,
+		Second,
+		Third,
+		Fourth,
+		Fifth
+	}
+
+	private static int StepMin { get; set; } = (int)Step.First;
+	private static int StepMax { get; set; } = (int)Step.Fifth;
+
+	[Parameter]
+	public int CurrentStep { get; set; } = StepMin;
+
+	[Parameter]
+	public EventCallback<int> CurrentStepChanged { get; set; }
+
+	private void DecreseStep()
+	{
+		if (CurrentStep == StepMin)
+		{
+			CurrentStep = StepMax;
+			CurrentStepChanged.InvokeAsync(StepMax);
+		}
+		else
+		{
+			CurrentStep--;
+			CurrentStepChanged.InvokeAsync(CurrentStep--);
+		}
+	}
+
+	private void IncreaseStep()
+	{
+		if (CurrentStep == StepMax)
+		{
+			CurrentStep = StepMin;
+			CurrentStepChanged.InvokeAsync(StepMin);
+
+		}
+		else
+		{
+			CurrentStep++;
+			CurrentStepChanged.InvokeAsync(CurrentStep++);
+		}
+	}
+}

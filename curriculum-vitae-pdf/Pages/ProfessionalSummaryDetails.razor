@@ -1,0 +1,32 @@
+﻿@inject IStringLocalizer<StringConstants> StringLocalizer
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<h3 class="h3">@StringConstants.ProfessionalSummary:</h3>
+			<div class="row">
+				<InputTextArea class="form-control" @attributes="Attributes" @bind-Value="@Model.ProfessionalSummary" />
+				@*<DetailsTextInput DataChanged="e => { Model.ProfessionalSummary = e; } "
+								  Data="@Model.ProfessionalSummary"
+								  Name="@nameof(PersonDetails.ProfessionalSummary)"
+								  Label="@StringLocalizer.GetString(nameof(PersonDetails.ProfessionalSummary))" />*@
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private IList<KeyValuePair<string, object>> Attributes =
+		new List<KeyValuePair<string, object>>();
+
+	public ProfessionalSummaryDetails()
+	{
+		Attributes.Add(new KeyValuePair<string, object>("rows", 10));
+	}
+
+	[Parameter]
+	public PersonDetails Model { get; set; }
+
+	[Parameter]
+	public EventCallback<PersonDetails> ModelChanged { get; set; }
+}

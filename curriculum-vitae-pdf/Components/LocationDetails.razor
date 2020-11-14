@@ -1,0 +1,26 @@
+﻿@inject IStringLocalizer<StringConstants> StringLocalizer
+
+<DetailsTextInput DataChanged="e => { Model.StreetAddress = e; } "
+				  Data="@Model.StreetAddress"
+				  Name="@nameof(Model.StreetAddress)"
+				  Label="@StringLocalizer.GetString(nameof(Model.StreetAddress))" />
+<DetailsTextInput DataChanged="e => { Model.City = e; } "
+				  Data="@Model.City"
+				  Name="@nameof(Model.City)"
+				  Label="@StringLocalizer.GetString(nameof(Model.City))" />
+<DetailsTextInput DataChanged="e => { Model.Country = e; } "
+				  Data="@Model.Country"
+				  Name="@nameof(Model.Country)"
+				  Label="@StringLocalizer.GetString(nameof(Model.Country))" />
+<DetailsTextInput DataChanged="e => { Model.Postcode = e; } "
+				  Data="@Model.Postcode"
+				  Name="@nameof(Model.Postcode)"
+				  Label="@StringLocalizer.GetString(nameof(Model.Postcode))" />
+
+@code {
+	[Parameter]
+	public Location Model { get; set; }
+
+	[Parameter]
+	public EventCallback<Location> ModelChanged { get; set; }
+}

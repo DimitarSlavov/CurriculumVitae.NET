@@ -1,0 +1,73 @@
+﻿@inject IStringLocalizer<StringConstants> StringLocalizer
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<input type="button" class="btn btn-success m-1" @onclick="@(() => AddNewExperience())" value="Add Workplace" />
+			<input type="button" class="btn btn-danger m-1 @(Number == default ? "disabled" : string.Empty)" @onclick="@(() => RemoveExperience())" value="Remove" />
+			<h3 class="h3">@StringConstants.Experience:</h3>
+			<div class="row">
+				<DetailsTextInput @bind-Data="@Model.Experience[Number].Employer"
+								  Name="@nameof(Experience.Employer)"
+								  Label="@StringLocalizer.GetString(nameof(Experience.Employer))" />
+				<DetailsTextInput @bind-Data="@Model.Experience[Number].JobTitle"
+								  Name="@nameof(Experience.JobTitle)"
+								  Label="@StringLocalizer.GetString(nameof(Experience.JobTitle))" />
+				<DateInput @bind-Data="Model.Experience[Number].StartDate"
+						   Name="@nameof(Experience.StartDate)"
+						   Label="@StringLocalizer.GetString(nameof(Experience.StartDate))" />
+				<DateInput @bind-Data="Model.Experience[Number].EndDate"
+						   Name="@nameof(Experience.EndDate)"
+						   Label="@StringLocalizer.GetString(nameof(Experience.EndDate))" />
+				<CheckBoxInput @bind-Data="Model.Experience[Number].WorkingHereNow"
+							   Name="@nameof(Experience.WorkingHereNow)"
+							   Label="@StringLocalizer.GetString(nameof(Experience.WorkingHereNow))" />
+				<div class="col-12">&nbsp;</div>
+				<LocationDetails @bind-Model="Model.Experience[Number].WorkLocation" />
+			</div>
+			<input class="btn btn-outline-secondary btn-outline-dark w-25 m-2" type="button" @onclick="() => DecreseStep()" name="Prev" value="Prev" />
+			<input class="btn btn-outline-secondary btn-outline-dark w-25 m-2" type="button" @onclick="() => IncreaseStep()" name="Next" value="Next" />
+		</div>
+	</div>
+</div>
+
+@code {
+	private int Number { get; set; } = default;
+
+	[Parameter]
+	public PersonDetails Model { get; set; }
+
+	[Parameter]
+	public EventCallback<PersonDetails> ModelChanged { get; set; }
+
+	private void DecreseStep()
+	{
+		if (Number > default(int))
+		{
+			Number--;
+		}
+	}
+
+	private void IncreaseStep()
+	{
+		if (Number < this.Model.Experience.Count - 1)
+		{
+			Number++;
+		}
+	}
+
+	private void AddNewExperience()
+	{
+		this.Model.Experience.Add(new Experience());
+		Number++;
+	}
+
+	private void RemoveExperience()
+	{
+		if (Number > default(int))
+		{
+			this.Model.Experience.RemoveAt(Number);
+			Number--;
+		}
+	}
+}

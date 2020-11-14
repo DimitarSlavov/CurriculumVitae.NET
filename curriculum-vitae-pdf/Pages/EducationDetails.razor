@@ -1,0 +1,36 @@
+﻿@inject IStringLocalizer<StringConstants> StringLocalizer
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<h3 class="h3">@StringConstants.Education:</h3>
+			<div class="row">
+				<DetailsTextInput DataChanged="e => { Model.Education.FieldOfStudy = e; } "
+								  Data="@Model.Education.FieldOfStudy"
+								  Name="@nameof(Education.FieldOfStudy)"
+								  Label="@StringLocalizer.GetString(nameof(Model.Education.FieldOfStudy))" />
+				<DetailsTextInput DataChanged="e => { Model.Education.Degree = e; } "
+								  Data="@Model.Education.Degree"
+								  Name="@nameof(Education.Degree)"
+								  Label="@StringLocalizer.GetString(nameof(Education.Degree))" />
+				<DetailsTextInput DataChanged="e => { Model.Education.SchoolName = e; } "
+								  Data="@Model.Education.SchoolName"
+								  Name="@nameof(Education.SchoolName)"
+								  Label="@StringLocalizer.GetString(nameof(Education.SchoolName))" />
+				<DateInput DataChanged="e => { Model.Education.Graduation = e; } "
+						   Name="@nameof(Education.Graduation)"
+						   Label="@StringLocalizer.GetString(nameof(Education.Graduation))" />
+				<div class="col-12">&nbsp;</div>
+				<LocationDetails @bind-Model="Model.Education.EducationLocation" />
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public PersonDetails Model { get; set; }
+
+	[Parameter]
+	public EventCallback<PersonDetails> ModelChanged { get; set; }
+}

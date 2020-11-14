@@ -1,0 +1,33 @@
+﻿<div class="progress @BlazorHelper.Toggle(ShowProgressBar, "d-none") position-absolute" style="background-color: #8112ff; top: 0; left: 0; right: 0; border-radius: 0; overflow: visible;">
+	<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="@_progressValue" aria-valuemin="@((int)Progress.Zero)" aria-valuemax="@((int)Progress.OneHundread)" style="width: @_progressValue%; background-color: #9b00fc;"></div>
+</div>
+
+@code {
+	private byte _progressValue;
+
+	public enum Progress
+	{
+		Zero = 0,
+		Twenty = 20,
+		Foutry = 40,
+		Sixty = 60,
+		Eighty = 80,
+		Ninety = 90,
+		OneHundread = 100,
+	}
+
+	[Parameter]
+	public bool ShowProgressBar { get; set; }
+
+	[Parameter]
+	public byte ProgressValue
+	{
+		get => _progressValue;
+		set 
+		{ 
+			_progressValue = value;
+			StateHasChanged(); 
+		}
+	}
+
+}

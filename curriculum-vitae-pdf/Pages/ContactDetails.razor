@@ -1,0 +1,43 @@
+﻿@inject IStringLocalizer<StringConstants> StringLocalizer
+
+<h3>
+	@StringConstants.LetsCompleteYourResumeHeading
+</h3>
+<p>
+	@StringConstants.HowDoYouWantEmployersToContactYou
+</p>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<h3 class="h3">@StringConstants.ContactDetails:</h3>
+			<div class="row">
+				<DetailsTextInput DataChanged="e => { Model.ContactDetails.FirstName = e; } "
+								  Data="@Model.ContactDetails.FirstName"
+								  Name="@nameof(Contact.FirstName)"
+								  Label="@StringLocalizer.GetString(nameof(Contact.FirstName))" />
+				<DetailsTextInput DataChanged="e => { Model.ContactDetails.Surname = e; } "
+								  Data="@Model.ContactDetails.Surname"
+								  Name="@nameof(Contact.Surname)"
+								  Label="@StringLocalizer.GetString(nameof(Contact.Surname))" />
+				<DetailsTextInput DataChanged="e => { Model.ContactDetails.PhoneNumber = e; } "
+								  Data="@Model.ContactDetails.PhoneNumber"
+								  Name="@nameof(Contact.PhoneNumber)"
+								  Label="@StringLocalizer.GetString(nameof(Contact.PhoneNumber))" />
+				<DetailsTextInput DataChanged="e => { Model.ContactDetails.EmailAddress = e; } "
+								  Data="@Model.ContactDetails.EmailAddress"
+								  Name="@nameof(Contact.EmailAddress)"
+								  Label="@StringLocalizer.GetString(nameof(Contact.EmailAddress))" />
+				<div class="col-12">&nbsp;</div>
+				<LocationDetails @bind-Model="Model.ContactDetails.ContactLocation" />
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public PersonDetails Model { get; set; }
+
+	[Parameter]
+	public EventCallback<PersonDetails> ModelChanged { get; set; }
+}

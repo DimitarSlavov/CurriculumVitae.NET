@@ -1,0 +1,22 @@
+﻿<div class="mt-3 @WrapperClass">
+	<label for="@Name">@Label</label>
+	<input type="text" class="w-100 input-group-text" name="@Name" value="@Data"
+		   @onchange="e => DataChanged.InvokeAsync(e.Value as string)" />
+</div>
+
+@code {
+	[Parameter]
+	public string Label { get; set; }
+
+	[Parameter]
+	public string Data { get; set; }
+
+	[Parameter]
+	public string Name { get; set; }
+
+	[Parameter]
+	public EventCallback<string> DataChanged { get; set; }
+
+	[Parameter]
+	public string WrapperClass { get; set; } = "col-6";
+}
